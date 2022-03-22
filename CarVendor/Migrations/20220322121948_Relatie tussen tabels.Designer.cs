@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarVendor.Migrations
 {
     [DbContext(typeof(CarVendorContext))]
-    [Migration("20220316135536_Initial migration")]
-    partial class Initialmigration
+    [Migration("20220322121948_Relatie tussen tabels")]
+    partial class Relatietussentabels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,10 +29,14 @@ namespace CarVendor.Migrations
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
 
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Mark")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Mark");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -40,6 +44,8 @@ namespace CarVendor.Migrations
                         .HasColumnType("nvarchar(8)");
 
                     b.HasKey("LicensePlate");
+
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("Cars");
                 });
@@ -54,15 +60,18 @@ namespace CarVendor.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PostalCode")
                         .IsRequired()
@@ -71,6 +80,22 @@ namespace CarVendor.Migrations
                     b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("CarVendor.Models.Car", b =>
+                {
+                    b.HasOne("CarVendor.Models.Customer", "Customer")
+                        .WithMany("Cars")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("CarVendor.Models.Customer", b =>
+                {
+                    b.Navigation("Cars");
                 });
 #pragma warning restore 612, 618
         }
